@@ -1,0 +1,3 @@
+class board {
+    config: baseChessman[];
+}
