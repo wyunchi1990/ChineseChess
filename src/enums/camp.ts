@@ -1,6 +1,4 @@
-module enums { 
-    const enum Camp {
-        RED,
-        BLACK,
-    }
+export enum Camp {
+    RED,
+    BLACK
 }
