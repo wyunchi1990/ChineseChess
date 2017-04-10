@@ -1,3 +1,4 @@
 class board {
-    config: baseChessman[];
+    config: baseChessman[] = [
+    ]
 }
