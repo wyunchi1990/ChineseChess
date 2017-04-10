@@ -1,4 +1,6 @@
-const enum Camp {
-    RED,
-    BLACK,
+module enums { 
+    const enum Camp {
+        RED,
+        BLACK,
+    }
 }
