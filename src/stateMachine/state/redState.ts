@@ -1,3 +1,0 @@
-class redState extends baseState {
-
-}

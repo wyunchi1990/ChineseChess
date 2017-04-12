@@ -2,6 +2,7 @@ import { Point } from './common/point';
 import { Camp } from './enums/camp';
 import { BaseChessman } from "./chessman";
 import Dictionary from './libs/typescript-collections/src/lib/Dictionary';
+import { data } from "./data/default";
 
 class board {
     chessman_set: Dictionary<number, BaseChessman> = new Dictionary<number, BaseChessman>();
@@ -11,9 +12,9 @@ class board {
         let chessman: BaseChessman = this._get_chessman_at_position(position);
 
         if (chessman == null || chessman.camp != camp) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private _generate_id(): number {
@@ -35,13 +36,16 @@ class board {
         this._init(data);
     }
 
-    private _get_chessman_at_position(position: Point): BaseChessman {
-        this.chessman_set.forEach((id: number, chessman: BaseChessman) => {
-            if (position.equal(chessman.position) && chessman.is_alive()) {
-                return chessman;
-            }
+    public _get_chessman_at_position(position: Point): BaseChessman {
+        let choosen_chessman_list: BaseChessman[] = this.chessman_set.values().filter(chessman => {
+            return position.equal(chessman.position) && chessman.is_alive();
         })
-        return null;
+
+        if (choosen_chessman_list.length == 0) {
+            return null;
+        } else if (choosen_chessman_list.length == 1) {
+            return choosen_chessman_list[0];
+        }
     }
 
     public move(choose_position: Point, next_position: Point): boolean {
@@ -52,6 +56,18 @@ class board {
         if (this._has_ally_at_position(choose_chessman.camp, next_position)) {
             return false;
         }
+        // TODO 这里还要检查很多东西
+        if (!choose_chessman.check_next_point(next_position)) {
+            return false
+        }
+        choose_chessman.position = next_position;
         return true;
     }
 }
+
+let b: board = new board(data);
+let move_result = b.move(new Point(0, 0), new Point(0, 1));
+console.log(move_result, b._get_chessman_at_position(new Point(0, 1)));
+move_result = b.move(new Point(0, 1), new Point(4, 2));
+// console.log(b.chessman_set.values());
+console.log(move_result);
