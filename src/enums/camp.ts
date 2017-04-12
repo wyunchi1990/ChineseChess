@@ -1,4 +1,4 @@
 export enum Camp {
     RED,
-    BLACK
+    BLACK,
 }

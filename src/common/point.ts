@@ -6,4 +6,8 @@ export class Point {
         this.x = x;
         this.y = y;
     }
+
+    public equal(position: Point): boolean {
+        return this.x == position.x && this.y == position.y;
+    }
 }
