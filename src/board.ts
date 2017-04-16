@@ -48,6 +48,10 @@ class board {
         }
     }
 
+    private _get_chessman_list_in_path(path: Point[]): BaseChessman[] {
+        
+    }
+
     public move(choose_position: Point, next_position: Point): boolean {
         let choose_chessman = this._get_chessman_at_position(choose_position);
         if (choose_chessman == null) {
