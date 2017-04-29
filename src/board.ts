@@ -3,6 +3,7 @@ import { Camp } from './enums/camp';
 import { BaseChessman } from "./chessman";
 import Dictionary from './libs/typescript-collections/src/lib/Dictionary';
 import { data } from "./data/default";
+import { HEIGHT_BOARD, WIDTH_BOARD } from './const/consts';
 
 class board {
     chessman_set: Dictionary<number, BaseChessman> = new Dictionary<number, BaseChessman>();
@@ -49,7 +50,7 @@ class board {
     }
 
     private _get_chessman_list_in_path(path: Point[]): BaseChessman[] {
-        
+        return [];
     }
 
     public move(choose_position: Point, next_position: Point): boolean {
@@ -67,6 +68,21 @@ class board {
         choose_chessman.position = next_position;
         return true;
     }
+
+    public dump() {
+        for (let row = HEIGHT_BOARD - 1; row >= 0; --row) {
+            let row_content = "";
+            for (let col = 0; col < WIDTH_BOARD; ++col) {
+                let chessman: BaseChessman = this._get_chessman_at_position(new Point(col, row));
+                if (chessman == null) {
+                    row_content += "+ ";
+                } else {
+                    row_content += chessman.name;
+                }
+            }
+            console.log(row_content);
+        }
+    }
 }
 
 let b: board = new board(data);
@@ -75,3 +91,4 @@ console.log(move_result, b._get_chessman_at_position(new Point(0, 1)));
 move_result = b.move(new Point(0, 1), new Point(4, 2));
 // console.log(b.chessman_set.values());
 console.log(move_result);
+b.dump();

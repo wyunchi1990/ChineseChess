@@ -4,6 +4,8 @@ import { ChessmanState } from './enums/chessmanState';
 import { translate_position_to_local, is_in_curt, is_in_motherland, get_point_in_segment } from "./utils/positionHelper";
 
 class BaseChessman {
+    public name: String;
+
     protected _id: number;
     get id(): number {
         return this._id;
@@ -52,6 +54,14 @@ class BaseChessman {
 }
 
 class Soldier extends BaseChessman {
+    get name(): String {
+        if (this.camp == Camp.RED) {
+            return "兵";
+        } else {
+            return "卒";
+        }
+    }
+
     check_next_point = function(next_point: Point): boolean {
         next_point = translate_position_to_local(next_point, this._camp);
         let current_point: Point = translate_position_to_local(this.position, this.camp);
@@ -75,6 +85,10 @@ class Soldier extends BaseChessman {
 }
 
 class Gun extends BaseChessman {
+    get name(): String {
+        return "炮";
+    }
+
     check_next_point = function(next_point: Point): boolean {
         return next_point.x == this.position.x || next_point.y == this.position.y;
     }
@@ -85,6 +99,10 @@ class Gun extends BaseChessman {
 }
 
 class Car extends BaseChessman {
+    get name(): String {
+        return "车";
+    }
+
     check_next_point = function(next_point: Point): boolean {
         return next_point.x == this.position.x || next_point.y == this.position.y;
     }
@@ -95,6 +113,10 @@ class Car extends BaseChessman {
 }
 
 class Horse extends BaseChessman {
+    get name(): String {
+        return "马";
+    }
+
     check_next_point = function(next_point: Point): boolean {  
         let delta_x = next_point.x - this.position.x;
         let delta_y = next_point.y - this.position.y;
@@ -123,6 +145,14 @@ class Horse extends BaseChessman {
 }
 
 class Minister extends BaseChessman {
+    get name(): String {
+        if (this.camp == Camp.RED) {
+            return "象";
+        } else {
+            return "相";
+        }
+    }
+
     check_next_point = function(next_point: Point): boolean {
         next_point = translate_position_to_local(next_point, this._camp);
         let current_point: Point = translate_position_to_local(this.position, this.camp);
@@ -147,6 +177,10 @@ class Minister extends BaseChessman {
 }
 
 class StrategicAdviser extends BaseChessman {
+    get name(): String {
+        return "士";
+    }
+
     check_next_point = function(next_point: Point): boolean {
         next_point = translate_position_to_local(next_point, this._camp);
         let current_point: Point = translate_position_to_local(this.position, this.camp);
@@ -170,6 +204,14 @@ class StrategicAdviser extends BaseChessman {
 }
 
 class King extends BaseChessman {
+    get name(): String {
+        if (this.camp == Camp.RED) {
+            return "将";
+        } else {
+            return "帅";
+        }
+    }
+
     check_next_point = function(next_point: Point): boolean {
         next_point = translate_position_to_local(next_point, this._camp);
         let current_point: Point = translate_position_to_local(this.position, this.camp);
