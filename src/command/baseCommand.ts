@@ -1,14 +1,14 @@
 import { commandTypeEnum } from '../enums/commandTypeEnum';
 
 export class BaseCommand {
-    private command_type: commandTypeEnum;
+    private _command_type: commandTypeEnum;
 
-    constructor(command_type: commandTypeEnum) {
-        this.command_type = command_type;
+    get command_type(): commandTypeEnum {
+        return this._command_type;
     }
 
-    public isUserCommand(): boolean {
-        return this.command_type == commandTypeEnum.USER;
+    constructor(command_type: commandTypeEnum) {
+        this._command_type = command_type;
     }
 
     public do: () => void;
