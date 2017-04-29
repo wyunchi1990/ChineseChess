@@ -96,6 +96,21 @@ class board {
 
         return true;
     }
+
+    public dump() {
+        for (let row = HEIGHT_BOARD - 1; row >= 0; --row) {
+            let row_content = "";
+            for (let col = 0; col < WIDTH_BOARD; ++col) {
+                let chessman: BaseChessman = this.get_chessman_at_position(new Point(col, row));
+                if (chessman == null) {
+                    row_content += "+ ";
+                } else {
+                    row_content += chessman.name;
+                }
+            }
+            console.log(row_content);
+        }
+    }
 }
 
 let b: board = new board(data);
@@ -105,3 +120,4 @@ move_result = b.move(new Point(0, 1), new Point(4, 2));
 // console.log(b.chessman_set.values());
 console.log(move_result);
 // console.log(b._get_chessman_list_in_path([new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(3, 0), new Point(4, 0), new Point(5, 0), new Point(6, 0), new Point(7, 0), new Point(8, 0)]))
+b.dump();
