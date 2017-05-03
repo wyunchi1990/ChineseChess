@@ -5,6 +5,7 @@
         "sourceMap": true
     },
     "files": [
-        "board.ts"
+        "command/historyManager.ts"
+        // "board.ts"
     ]
 }

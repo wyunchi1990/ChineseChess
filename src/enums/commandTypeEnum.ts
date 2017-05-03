@@ -1,4 +1,4 @@
 export enum commandTypeEnum {
-    USER,
-    AUTO,
+    MOVE,
+    KILL,
 }

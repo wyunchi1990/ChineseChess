@@ -5,7 +5,7 @@ import { BaseChessman } from "./chessman";
 import Dictionary from './libs/typescript-collections/src/lib/Dictionary';
 import { data } from "./data/default";
 
-class board {
+export class Board {
     chessman_set: Dictionary<number, BaseChessman> = new Dictionary<number, BaseChessman>();
     _id_count: number = 0;
 
@@ -64,40 +64,62 @@ class board {
         return false;
     }
 
-    public move(choose_position: Point, next_position: Point): boolean {
+    public try_to_move(choose_position: Point, next_position: Point): [boolean, BaseChessman] {
+        console.log("move from ", choose_position, " to ", next_position);
         if (!this._validate_position(choose_position) || !this._validate_position(next_position)) {
-            return false;
+            return [false, null];
         }
 
         let choose_chessman = this.get_chessman_at_position(choose_position);
         if (choose_chessman == null) {
-            return false;
+            return [false, null];
         }
 
         let next_position_chessman = this.get_chessman_at_position(next_position);
         if (this._has_ally_at_position(choose_chessman.camp, next_position)) {
-            return false;
+            return [false, null];
         }
         // TODO 这里还要检查很多东西
         let [path, barricade_number]: [Point[], number] = choose_chessman.get_barricade_number(next_position);
         if (this._get_chessman_list_in_path(path).length != barricade_number) {
-            return false;
+            return [false, null];
         }
 
         if (!choose_chessman.check_next_point(next_position)) {
-            return false;
+            return [false, null];
         }
 
+        return [true, next_position_chessman];
+    }
+
+    public move(choose_position: Point, next_position: Point): void {
+        if (!this._validate_position(choose_position) || !this._validate_position(next_position)) {
+            return null;
+        }
+
+        let choose_chessman = this.get_chessman_at_position(choose_position);
+        if (choose_chessman == null) {
+            return null;
+        }
+
+        let next_position_chessman = this.get_chessman_at_position(next_position);
+        if (this._has_ally_at_position(choose_chessman.camp, next_position)) {
+            return null;
+        }
+        // TODO 这里还要检查很多东西
+        let [path, barricade_number]: [Point[], number] = choose_chessman.get_barricade_number(next_position);
+        if (this._get_chessman_list_in_path(path).length != barricade_number) {
+            return null;
+        }
+
+        if (!choose_chessman.check_next_point(next_position)) {
+            return null;
+        }
         choose_chessman.position = next_position;
-
-        if (next_position_chessman != null) {
-            next_position_chessman.death();
-        }
-
-        return true;
     }
 
     public dump() {
+        console.log("=======================================");
         for (let row = HEIGHT_BOARD - 1; row >= 0; --row) {
             let row_content = "";
             for (let col = 0; col < WIDTH_BOARD; ++col) {
@@ -110,14 +132,6 @@ class board {
             }
             console.log(row_content);
         }
+        console.log("=======================================");
     }
 }
-
-let b: board = new board(data);
-let move_result = b.move(new Point(0, 0), new Point(0, 1));
-console.log(move_result, b.get_chessman_at_position(new Point(0, 1)));
-move_result = b.move(new Point(0, 1), new Point(4, 2));
-// console.log(b.chessman_set.values());
-console.log(move_result);
-// console.log(b._get_chessman_list_in_path([new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(3, 0), new Point(4, 0), new Point(5, 0), new Point(6, 0), new Point(7, 0), new Point(8, 0)]))
-b.dump();
