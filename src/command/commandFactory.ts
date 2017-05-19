@@ -1,4 +1,4 @@
-import { BaseCommand, MoveCommand, KillCommand } from "./baseCommand";
+import { BaseCommand, MoveCommand, KillCommand } from "./baseInnerCommand";
 import { commandTypeEnum } from "../enums/commandTypeEnum"
 
 export class CommandFactory {

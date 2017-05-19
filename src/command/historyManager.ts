@@ -1,4 +1,4 @@
-import { BaseCommand } from './baseCommand';
+import { BaseCommand } from './baseInnerCommand';
 import { commandTypeEnum } from '../enums/commandTypeEnum';
 import { Board } from "../board"
 import { data } from "../data/default";
@@ -24,45 +24,41 @@ class HistoryManager {
     }
 
     public add_command(command: BaseCommand): void {
-        this.history.push(command);
-        this.index += 1;
-    }
-
-    public do(command: BaseCommand): BaseChessman {
-        let kill_chessman: BaseChessman = command.do(this.board);
-        // while (this.history.length >= this.index + 1) {
-        //     this.history.pop();
-        // }
-        this.history = this.history.slice(0, this.index);
+        this.history = this.history.slice(0, this.index + 1);
         this.history.push(command);
         this.index = this.history.length - 1;
-        this.board.dump();
+    }
 
-        return kill_chessman;
+    public do(command: BaseCommand): void {
+        let kill_chessman: BaseChessman = command.do(this.board);
+        if (kill_chessman != null) {
+            let kill_command: BaseCommand = CommandFactory.createCommand({"command_type": commandTypeEnum.KILL, "chessman": kill_chessman});
+            this.add_command(kill_command);
+            kill_command.do(this.board)
+        }
+        this.add_command(command);
+        command.do(this.board);
+        this.board.dump();
+    }
+
+    private redo_single_command(): void {
+        this.index += 1;
+        let current_command: BaseCommand = this.current_command();
+        current_command.redo(this.board);
     }
 
     public redo(): void {
-        console.log("redo ", this.index, this.history);
-        this.index += 1;
-        if (this.index >= this.history.length) {
+        if (this.index >= this.history.length - 1) {
             return;
         }
 
-        let current_command: BaseCommand = this.current_command();
-        if (current_command == null) {
-            return;
+        while (this.index <= this.history.length - 1) {
+            this.redo_single_command();
+            if (this.isMoveCommand(this.index)) {
+                this.board.dump();
+                return;
+            }
         }
-        console.log("redo ", current_command);
-        current_command.redo(this.board);
-
-        while (this.index < this.history.length - 1 && !this.isMoveCommand(this.index + 1)) {
-            this.index += 1;
-            // redo auto command
-            let current_command: BaseCommand = this.current_command();
-
-            current_command.redo(this.board);
-        }
-        this.board.dump();
     }
 
     private isMoveCommand(index: number): boolean {
@@ -74,25 +70,20 @@ class HistoryManager {
         return command.command_type == commandTypeEnum.MOVE;
     }
 
+    private undo_single_command(): void {
+        let current_command: BaseCommand = this.current_command();
+        current_command.undo(this.board);
+        this.index -= 1;
+    }
+
     public undo(): void {
-        console.log("undo", this.index, this.current_command());
         if (this.index < 0) {
             return;
         }
 
-        let current_command: BaseCommand = this.current_command();
-        if (current_command == null) {
-            return;
-        }
-        current_command.undo(this.board);
-        this.index -= 1;
-
-        while (this.index >= 0 && !this.isMoveCommand(this.index)) {
-            // undo auto command
-            let current_command: BaseCommand = this.current_command();
-
-            current_command.undo(this.board);
-            this.index -= 1;
+        this.undo_single_command();
+        while (this.index > 0 && !this.isMoveCommand(this.index)) {
+            this.undo_single_command();
         }
         this.board.dump();
     }
@@ -110,26 +101,29 @@ let b: Board = new Board(data);
 let historyManager: HistoryManager = new HistoryManager(b);
 let chessman: BaseChessman = b.get_chessman_at_position(new Point(0, 0));
 let command: BaseCommand = CommandFactory.createCommand({"command_type": commandTypeEnum.MOVE, "chessman": chessman, "move_to_position": new Point(0, 1)});
-let kill_chessman: BaseChessman = historyManager.do(command);
-historyManager.undo();
-historyManager.redo();
+historyManager.do(command);
+// historyManager.add_command(command);
+// historyManager.undo();
+// historyManager.redo();
+
 chessman = b.get_chessman_at_position(new Point(1, 2));
 command = CommandFactory.createCommand({"command_type": commandTypeEnum.MOVE, "chessman": chessman, "move_to_position": new Point(1, 9)});
-kill_chessman = historyManager.do(command);
-if (kill_chessman != null) {
-    console.log("kill ", kill_chessman);
-    command = CommandFactory.createCommand({"command_type": commandTypeEnum.KILL, "chessman": kill_chessman});
-    historyManager.add_command(command);
-    // historyManager.do(command);
-}
-console.log("move gun ", historyManager.index, historyManager.history);
+historyManager.do(command);
+chessman = b.get_chessman_at_position(new Point(7, 2));
+command = CommandFactory.createCommand({"command_type": commandTypeEnum.MOVE, "chessman": chessman, "move_to_position": new Point(7, 9)});
+historyManager.do(command);
+historyManager.undo();
 historyManager.undo();
 historyManager.redo();
+
+historyManager.redo();
+historyManager.redo();
+historyManager.undo();
+historyManager.undo();
+historyManager.undo();
+historyManager.undo();
 console.log(historyManager.index, historyManager.history);
-// let move_result = b.move(new Point(0, 0), new Point(0, 1));
-// console.log(move_result, b.get_chessman_at_position(new Point(0, 1)));
-// move_result = b.move(new Point(0, 1), new Point(4, 2));
-// // console.log(b.chessman_set.values());
-// console.log(move_result);
-// // console.log(b._get_chessman_list_in_path([new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(3, 0), new Point(4, 0), new Point(5, 0), new Point(6, 0), new Point(7, 0), new Point(8, 0)]))
-// b.dump();
+chessman = b.get_chessman_at_position(new Point(7, 2));
+command = CommandFactory.createCommand({"command_type": commandTypeEnum.MOVE, "chessman": chessman, "move_to_position": new Point(7, 9)});
+historyManager.do(command);
+console.log(historyManager.index, historyManager.history);
